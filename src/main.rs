@@ -2,6 +2,7 @@ extern crate core;
 
 use std::future::ready;
 use std::net::SocketAddr;
+use std::sync::Arc;
 
 use hyper::service::make_service_fn;
 use hyper::Server;
@@ -9,6 +10,9 @@ use log::info;
 use onlyerror::Error;
 use tokio::runtime::Runtime;
 
+use crate::rss::Entries;
+
+mod rss;
 mod rss_service;
 
 #[derive(Debug)]
@@ -68,9 +72,12 @@ fn run(args: Args) -> Result<(), Error> {
 
 	drop(guard);
 
+	let entries = Entries::new();
+
 	tokio_runtime.block_on(server.serve(make_service_fn(|_addr_stream| {
+		let entries = Arc::clone(&entries);
 		ready(Result::<rss_service::Service, rss_service::Error>::Ok(
-			rss_service::Service::new(),
+			rss_service::Service::new(entries),
 		))
 	})))?;
 

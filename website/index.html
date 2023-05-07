@@ -15,9 +15,16 @@
 				display: flex;
 				flex-direction: column;
 		}
+
+		.entry_data {
+				display: grid;
+				grid-auto-rows: 1fr 3fr;
+				border: 1px solid red;
+		}
 	</style>
 </head>
 <body>
+	<div>Visitors count: {visitors}</div>
 	<div id="new_entry">
 		<form id="new_entry_form" method="post" action="add_entry">
 			<div>Add new entry</div>
@@ -30,6 +37,17 @@
 
 			<input type="submit" value="Add">
 		</form>
+	</div>
+	<div id="entries">
+		<div>Entries: </div>
+		{% foreach entries %}
+		<div class="entry_data">
+			<div>Name</div>
+			<div>{name}</div>
+			<div>URL</div>
+			<div>{url}</div>
+		</div>
+		{% endfor %}
 	</div>
 </body>
 </html>
