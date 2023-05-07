@@ -1,0 +1,17 @@
+[package]
+name = "rss-checker"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+onlyerror = "0.1.2"
+pico-args = "0.5.0"
+hyper = { version = "0.14.26", features = ["server", "http1", "http2", "tcp", "stream"] }
+tokio = { version = "1.28.0", features = ["rt-multi-thread", "net", "macros", "fs"] }
+log = "0.4.17"
+
+[dependencies.aqa_logger]
+git = "https://github.com/aQaTL/aqa_logger.git"
+rev = "9a97c65975c503dfd67ca34fba30f329b577f466"

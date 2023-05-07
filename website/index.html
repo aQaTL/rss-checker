@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>aQaRSS</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		body {
+				display: grid;
+				grid-gap: 1em;
+		}
+
+		#new_entry_form {
+				border: 1px solid black;
+				display: flex;
+				flex-direction: column;
+		}
+	</style>
+</head>
+<body>
+	<div id="new_entry">
+		<form id="new_entry_form" method="post" action="add_entry">
+			<div>Add new entry</div>
+
+			<label for="entry_name">Name</label>
+			<input type="text" id="entry_name" name="entry_name">
+
+			<label for="entry_url">URL</label>
+			<input type="text" id="entry_url" name="entry_url">
+
+			<input type="submit" value="Add">
+		</form>
+	</div>
+</body>
+</html>
