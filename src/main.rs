@@ -14,6 +14,7 @@ use crate::rss::Entries;
 
 mod rss;
 mod rss_service;
+mod templater;
 
 #[derive(Debug)]
 struct Args {

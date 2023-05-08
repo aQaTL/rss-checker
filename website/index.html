@@ -24,7 +24,7 @@
 	</style>
 </head>
 <body>
-	<div>Visitors count: {visitors}</div>
+	<div>Visitors count: { visitors }</div>
 	<div id="new_entry">
 		<form id="new_entry_form" method="post" action="add_entry">
 			<div>Add new entry</div>
@@ -40,14 +40,14 @@
 	</div>
 	<div id="entries">
 		<div>Entries: </div>
-		{% foreach entries %}
+		{ foreach entries }
 		<div class="entry_data">
 			<div>Name</div>
-			<div>{name}</div>
+			<div>{ _.name }</div>
 			<div>URL</div>
-			<div>{url}</div>
+			<div>{ _.url }</div>
 		</div>
-		{% endfor %}
+		{ endfor }
 	</div>
 </body>
 </html>

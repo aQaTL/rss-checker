@@ -1,10 +1,10 @@
+use std::collections::HashMap;
 use std::future::{ready, Future};
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context, Poll};
 
-use futures_core::Stream;
-use hyper::body::{Bytes, HttpBody};
+use hyper::body::HttpBody;
 use hyper::{Body, Method, Request, Response, StatusCode};
 use log::{debug, info};
 use nom::bytes::complete::{tag, take_till, take_while};
@@ -12,12 +12,14 @@ use nom::sequence::{preceded, separated_pair};
 use onlyerror::Error;
 use tokio::sync::RwLock;
 
-use crate::Entries;
+use crate::{templater, Entries};
 
 #[derive(Debug, Error)]
 pub enum Error {
 	#[error("malformed add_entry form payload")]
 	ParseAddEntryForm(nom::Err<nom::error::Error<String>>),
+	#[error("internal error")]
+	Templater(#[from] templater::Error),
 }
 
 pub struct Service {
@@ -74,46 +76,43 @@ pub fn split_uri_path(path: &str) -> impl Iterator<Item = &str> {
 async fn handle_index(
 	_req: Request<Body>,
 	entries: Arc<RwLock<Entries>>,
-	_visits: u64,
+	visits: u64,
 ) -> Result<Response<Body>, Error> {
 	let index_file = std::fs::read_to_string("./website/index.html").unwrap();
 	// let index_file = index_file.replace("{visitors}", &visits.to_string());
 
 	let entries_g = entries.read().await;
 	debug!("Entries: {:#?}", entries_g.entries);
+
+	let index = template_index(&index_file, &entries_g, visits)?;
+
 	drop(entries_g);
 
 	Ok(Response::builder()
 		.status(StatusCode::OK)
 		.header("Content-Type", "text/html")
-		.body(Body::wrap_stream(StreamingIndex {
-			entries,
-			index_file,
-			sent: 0,
-		}))
+		.body(index.into())
 		.unwrap())
 }
 
-struct StreamingIndex {
-	#[allow(dead_code)]
-	entries: Arc<RwLock<Entries>>,
+pub fn template_index(
+	template: &str,
+	entries: &Entries,
+	visits: u64,
+) -> Result<String, templater::Error> {
+	let mut vars = HashMap::new();
+	vars.insert("visitors".to_string(), (visits as i64).into());
+	vars.insert(
+		"entries".to_string(),
+		entries
+			.entries
+			.iter()
+			.map(|(name, url)| (name.clone(), url.clone().into()))
+			.collect::<HashMap<_, _>>()
+			.into(),
+	);
 
-	index_file: String,
-	sent: usize,
-}
-
-impl Stream for StreamingIndex {
-	type Item = Result<Bytes, std::io::Error>;
-
-	fn poll_next(mut self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-		if self.sent == self.index_file.len() {
-			return Poll::Ready(None);
-		}
-
-		let bytes = Bytes::from(std::mem::take(&mut self.index_file));
-		self.sent = bytes.len();
-		Poll::Ready(Some(Ok(bytes)))
-	}
+	templater::template(template, vars)
 }
 
 async fn handle_add_entry(

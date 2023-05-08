@@ -12,7 +12,7 @@ hyper = { version = "0.14.26", features = ["server", "http1", "http2", "tcp", "s
 tokio = { version = "1.28.0", features = ["rt-multi-thread", "net", "macros", "fs"] }
 log = "0.4.17"
 nom = "7.1.3"
-futures-core = "0.3.28"
+bytes = "1.4.0"
 
 [dependencies.aqa_logger]
 git = "https://github.com/aQaTL/aqa_logger.git"

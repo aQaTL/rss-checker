@@ -302,7 +302,7 @@ name = "rss-checker"
 version = "0.1.0"
 dependencies = [
  "aqa_logger",
- "futures-core",
+ "bytes",
  "hyper",
  "log",
  "nom",
